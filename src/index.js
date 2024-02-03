@@ -8,8 +8,7 @@ import userRouter from './routes/user.routes.js';
 dotenv.config({
     path:'./env'
 })
-app.use('/api/v1/users', userRouter);
-
+app.use('/api/v1/users', userRouter)
 connectDB()
 .then(()=>{
     app.listen(process.env.PORT || 8000,()=>{
