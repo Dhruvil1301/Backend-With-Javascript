@@ -6,7 +6,7 @@ import userRouter from './routes/user.routes.js';
  const app = express()
  app.use(express.json());
 dotenv.config({
-    path:'./env'
+    path:'./.env'
 })
 app.use('/api/v1/users', userRouter)
 connectDB()

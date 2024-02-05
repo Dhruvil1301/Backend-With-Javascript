@@ -1,93 +1,94 @@
-import mongoose,{Schema} from "mongoose";
-import  Jwt  from "jsonwebtoken";
-import bcrypt from "bcrypt"
+import mongoose, { Schema } from "mongoose";
+import Jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
-const userSchema=new Schema(
+const userSchema = new mongoose.Schema(
     {
-        username:{
+        username: {
             type: String,
-            required:true,
-            unique:true,
-            lowecase:true,
-            trim:true,
-            index:true
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true,
+            index: true
         },
-       
-        email:{
+        email: {
             type: String,
-            required:true,
-            unique:true,
-            lowecase:true,
-            trim:true,
+            required: true,
+            unique: true,
+            lowercase: true,
+            trim: true
         },
-        fullname:{
+        fullname: {
             type: String,
-            required:true,
-            lowecase:true,
-            trim:true,
+            required: true,
+            lowercase: true,
+            trim: true
         },
-        avatar:{
-            type: String,//cloudinary url
-            required:true,
+        avatar: {
+            type: String, // cloudinary url
         },
-        coverImage:{
-            type: String,//cloudinary url
+        coverImage: {
+            type: String, // cloudinary url
         },
-        watchHistory:[
+        watchHistory: [
             {
-                type:Schema.Types.ObjectId,
-                ref:"Video"
+                type: Schema.Types.ObjectId,
+                ref: "Video"
             }
         ],
-        password:{
-            typr:String,
-            required:[
-                true,'PAssword is required'
-            ]
+        password: {
+            type: String,
+            required: [true, 'Password is required']
         },
-        refreshToken:{
-            type:String,
+        refreshToken: {
+            type: String,
         }
     },
     {
-        timeStamps:true
+        timestamps: true
     }
-)
-userSchema.pre("save",async function (next) {
-    if(!this.isModified("password")) return next();
-    this.password= await bcrypt.hash(this.password,10)
-    next()
-})
-userSchema.methods.isPasswordCorrect=async function(password){
-  return await  bcrypt.compare(password,this.password)
-}
-userSchema.methods.generateAccessToken =function(){
-   return Jwt.sign(
+);
+
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
+    next();
+});
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.generateAccessToken = function () {
+    return Jwt.sign(
         {
-            _id:this._id,
-            email:this.email,
-            username:this.username,
-            fullname:this.fullname
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+            fullname: this.fullname
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn:process.env.ACESS_TOKEN_EXPIRY
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
         }
-    )
-}
-userSchema.methods.generateRefreshToken =function(){
+    );
+};
+
+userSchema.methods.generateRefreshToken = function () {
     return Jwt.sign(
         {
-            _id:this._id,
-            email:this.email,
-            username:this.username,
-            fullname:this.fullname
+            _id: this._id,
+            email: this.email,
+            username: this.username,
+            fullname: this.fullname
         },
         process.env.REFRESH_TOKEN_SECRET,
         {
-            expiresIn:process.env.REFRESH_TOKEN_EXPIRY
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
         }
-    )
-}
+    );
+};
 
-export const User=mongoose.model("User",userSchema)
+const User = mongoose.model('User', userSchema);
+export default User;
